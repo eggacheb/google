@@ -1,23 +1,18 @@
-const { createProxyMiddleware } = require("http-proxy-middleware");
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    url.hostname = 'eggacheb-fast.hf.space'; // Use 'hostname' instead of 'host'
 
-module.exports = (req, res) => {
-  let target = "https://www.google.com/";//your website url
-  //   if (
-  //     req.url.startsWith("/api") ||
-  //     req.url.startsWith("/auth") ||
-  //     req.url.startsWith("/banner") ||
-  //     req.url.startsWith("/CollegeTask")
-  //   ) {
-  //     target = "http://106.15.2.32:6969";
-  //   }
+    // Create a new request with the modified URL
+    const newRequest = new Request(url.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+      redirect: 'follow'
+    });
 
-  createProxyMiddleware({
-    target,
-    changeOrigin: true,
-    pathRewrite: {
-      // rewrite request path `/backend`
-      //  /backend/user/login => http://google.com/user/login
-      //   "^/backend/": "/",
-    },
-  })(req, res);
-};
+    // Forward the new request
+    const response = await fetch(newRequest);
+    return response;
+  }
+}
